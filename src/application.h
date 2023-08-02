@@ -14,6 +14,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include <iostream>
 #include <chrono>
 
@@ -21,7 +25,14 @@ enum ERROR_CODE {
     SUCCESS = 0,
     GLFW_INIT_ERROR = -1,
     WINDOW_INIT_ERROR = -2,
-    GLEW_INIT_ERROR = -3
+    GLEW_INIT_ERROR = -3,
+    IMGUI_INIT_ERROR = -4
+};
+
+enum GUI_STYLE {
+    CLASSIC = 0,
+    DARK = 1,
+    LIGHT = 2
 };
 
 class [[maybe_unused]] application {
@@ -37,15 +48,21 @@ private:
     uint8_t background_color_b = 255;
     uint8_t background_color_a = 255;
 
+    GUI_STYLE _gui_style = GUI_STYLE::DARK;
+
     static bool _initialize_glfw();
 
     bool _initialize_window();
 
     static bool _initialize_glew();
 
+    bool _initialize_imgui();
+
     ERROR_CODE _initialize();
 
     void _render() const;
+
+    void _gui() const;
 
 public:
     [[maybe_unused]] application(
@@ -68,4 +85,6 @@ public:
             const uint8_t &G,
             const uint8_t &B,
             const uint8_t &A);
+
+    [[maybe_unused]] void set_gui_style(const GUI_STYLE &STYLE);
 };

@@ -29,6 +29,8 @@ int main() {
             WINDOW_BACKGROUND_COLOR_A
     );
 
+    app.set_gui_style(WINDOW_GUI_STYLE);
+
     while (!app.application_should_close()) {
         app.loop();
     }

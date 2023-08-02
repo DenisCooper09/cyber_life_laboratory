@@ -86,6 +86,50 @@ bool application::_initialize_glew() {
     return true;
 }
 
+bool application::_initialize_imgui() {
+    std::cout << "ImGui initialization...\t";
+    std::cout.flush();
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void) io;
+
+    switch (_gui_style) {
+        case CLASSIC: {
+            ImGui::StyleColorsClassic();
+            break;
+        }
+        case DARK: {
+            ImGui::StyleColorsDark();
+            break;
+        }
+        case LIGHT: {
+            ImGui::StyleColorsLight();
+            break;
+        }
+        default: {
+            std::cerr << " [ FAILED ]" << std::endl;
+            return false;
+        }
+    }
+
+    ImGui_ImplGlfw_InitForOpenGL(_window, true);
+
+    // OpenGL version is hardcoded. Will be fixed later.
+    ImGui_ImplOpenGL3_Init("#version 460");
+
+    auto end = std::chrono::high_resolution_clock::now();
+    long long duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+    std::cout << " [ SUCCESS ]\tTime taken: " << duration << " microseconds." << std::endl;
+    std::cout.flush();
+
+    return true;
+}
+
 [[maybe_unused]] ERROR_CODE application::_initialize() {
     std::cout << " ######  ##    ## ########  ######## ########     ##          ###    ######## " << std::endl;
     std::cout << "##    ##  ##  ##  ##     ## ##       ##     ##    ##         ## ##   ##     ##" << std::endl;
@@ -100,6 +144,7 @@ bool application::_initialize_glew() {
     if (!_initialize_glfw()) return ERROR_CODE::GLFW_INIT_ERROR;
     if (!_initialize_window()) return ERROR_CODE::WINDOW_INIT_ERROR;
     if (!_initialize_glew()) return ERROR_CODE::GLEW_INIT_ERROR;
+    if (!_initialize_imgui()) return ERROR_CODE::IMGUI_INIT_ERROR;
 
     std::cout << std::endl;
     std::cout << "OpenGL version is " << glGetString(GL_VERSION) << std::endl;
@@ -113,6 +158,20 @@ void application::_render() const {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Additional code goes here...
+}
+
+void application::_gui() const {
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Exit", "Alt+F4")) {
+                glfwSetWindowShouldClose(_window, true);
+            }
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
 }
 
 [[maybe_unused]] application::application(
@@ -145,6 +204,15 @@ application::~application() {
 
     _render();
 
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    _gui();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     // Or here, after renderer...
 
     glfwSwapBuffers(_window);
@@ -168,4 +236,8 @@ application::~application() {
     background_color_g = G;
     background_color_b = B;
     background_color_a = A;
+}
+
+[[maybe_unused]] void application::set_gui_style(const GUI_STYLE &STYLE) {
+    _gui_style = STYLE;
 }

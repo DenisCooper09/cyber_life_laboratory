@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "application.h"
+
 #include <cstdint>
 
 // ---------------- WINDOW ----------------
@@ -23,3 +25,5 @@ constexpr uint8_t WINDOW_BACKGROUND_COLOR_R = 255;
 constexpr uint8_t WINDOW_BACKGROUND_COLOR_G = 255;
 constexpr uint8_t WINDOW_BACKGROUND_COLOR_B = 255;
 constexpr uint8_t WINDOW_BACKGROUND_COLOR_A = 255;
+
+constexpr GUI_STYLE WINDOW_GUI_STYLE = GUI_STYLE::DARK;
